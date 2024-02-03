@@ -1,5 +1,18 @@
+<?php
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION["username"])) {
+    // If not logged in, redirect to the login page
+    header("Location: index.php");
+    exit();
+}
+
+// Display the secured content
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 
 <head>
     <meta charset="UTF-8">

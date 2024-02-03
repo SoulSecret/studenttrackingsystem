@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 
     require 'connection/connection.php';
@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 
     // Check if the submitted credentials are valid
     if ($dbUsername && password_verify($passW, $dbPassword)) {
+        $_SESSION["username"] = $username;
         // Successful login - Redirect or perform other actions
         header('Location: dashboard.php'); // Replace 'welcome.php' with your desired page
         exit();

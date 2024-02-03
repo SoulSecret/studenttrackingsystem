@@ -48,8 +48,8 @@
                             <button type="submit" class="btn btn-success" name="register">Register</button><br>
                             <center>
                                 <p>Do you have an account?</p>
-                                <button type="button" class="btn btn-primary ml-auto"
-                                    onclick="window.location.href='/alumnisystem'">Login</button>
+                                <button type="button" class="btn btn-primary"
+                                    onclick="window.location.href='index.php'">Login</button>
                             </center>
                         </form>
                     </div>
