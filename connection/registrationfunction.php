@@ -6,11 +6,15 @@ $registrationError = '';
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['register'])) {
 
+
+    $user = $_POST['registerUsername'];
+    $pass = $_POST['registerPassword'];
+    $hashedPassword = password_hash($pass, PASSWORD_BCRYPT);
     require 'connection/connection.php';
 
     // Use prepared statements to prevent SQL injection
     $stmt = $connection->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $userN, $passW);
+    $stmt->bind_param("ss", $user, $hashedPassword);
 
     // Execute the prepared statement
     if ($stmt->execute()) {
