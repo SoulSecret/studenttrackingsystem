@@ -1,14 +1,11 @@
 <?php
 session_start();
 
-// Check if the user is logged in
 if (!isset($_SESSION["username"])) {
-    // If not logged in, redirect to the login page
     header("Location: index.php");
     exit();
 }
 
-// Display the secured content
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,8 +14,7 @@ if (!isset($_SESSION["username"])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Bootstrap Navigation Bar in PHP</title>
-    <!-- Include Bootstrap CSS -->
+    <title>Student Tracking System</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <?php require 'connection/add_student.php' ?>
     <?php require 'connection/delete_student.php' ?>
@@ -55,24 +51,29 @@ if (!isset($_SESSION["username"])) {
             <select id="filterProgram" class="form-control">
                 <option value="">All Programs</option>
                 <?php
-                // Fetch program names from the database
-                $queryPrograms = "SELECT * FROM program_name";
-                $resultPrograms = mysqli_query($connection, $queryPrograms);
-
-                // Loop through the results to generate options
-                while ($rowProgram = mysqli_fetch_assoc($resultPrograms)) {
-                    echo '<option value="' . $rowProgram["program_name"] . '">' . $rowProgram["program_name"] . '</option>';
-                }
-                ?>
+        $queryPrograms = "SELECT * FROM program_name";
+        $resultPrograms = mysqli_query($connection, $queryPrograms);
+        while ($rowProgram = mysqli_fetch_assoc($resultPrograms)) {
+            echo '<option value="' . $rowProgram["program_name"] . '">' . $rowProgram["program_name"] . '</option>';
+        }
+        ?>
             </select>
         </div>
 
+        <div class="form-group">
+            <label for="searchInput">Search:</label>
+            <input type="text" id="searchInput" class="form-control">
+        </div>
+
+        <button id="searchBtn" class="btn btn-primary" style="margin-bottom:10px">Search</button>
+        
         <table id="alumniTable" class="table table-bordered table-striped">
             <thead class="thead-light">
                 <tr>
                     <th>Program Name</th>
                     <th>Name Of Graduate</th>
-                    <th>Status<br>(Employed, Unemployed, Not tracked)</th>
+                    <th>School Year<br> Graduated</th>
+                    <th>Status<br>(Employed, <br> Unemployed,<br> Not tracked)</th>
                     <th>Name Of Company/<br>Type of Business</th>
                     <th>Position in Company</th>
                     <th>Tracked By:</th>
@@ -84,18 +85,16 @@ if (!isset($_SESSION["username"])) {
                 </tr>
             </thead>
             <tbody>
-                <!--button type='button' class='btn btn-info' data-toggle='modal' data-target='#viewAlumniModal{$row['id']}'>
-                                    View
-                                </button-->
                 <?php
                 if ($connection) {
-                    $result = mysqli_query($connection, "SELECT students_form.*, program_name.program_name FROM students_form INNER JOIN program_name ON students_form.program_name_id = program_name.id");
+                    $result = mysqli_query($connection, "SELECT students_form.*, program_name.program_name FROM students_form INNER JOIN program_name ON students_form.program_name_id = program_name.id ORDER BY program_name, students_form.fullname ASC");
 
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "
                         <tr data-program-name='{$row['program_name']}'>
                             <td>{$row['program_name']}</td>
                             <td>{$row['fullname']}</td>
+                            <td>{$row['sygraduate']}</td>
                             <td>{$row['status']}</td>
                             <td>{$row['noc_tob']}</td>
                             <td>{$row['position_in_company']}</td>
@@ -118,34 +117,6 @@ if (!isset($_SESSION["username"])) {
                         </tr>
                     ";
 
-                        //add new student modal
-                        echo "
-                     <div class='modal fade mx-auto' id='viewAlumniModal{$row['id']}' tabindex='-1' role='dialog' aria-labelledby='viewAlumniModalLabel{$row['id']}' aria-hidden='true'>
-                         <div class='modal-dialog' role='document'>
-                             <div class='modal-content'>
-                                 <div class='modal-header'>
-                                     <h5 class='modal-title' id='viewAlumniModalLabel{$row['id']}'>View Student Data</h5>
-                                     <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
-                                         <span aria-hidden='true'>&times;</span>
-                                     </button>
-                                 </div>
-                                 <div class='modal-body'>
-                                     <p>Program Name: <b>{$row['program_name']}</b></p>
-                                     <p>Student Name: <b>{$row['fullname']}</b></p>
-                                     <p>Status: <b>{$row['status']}</b></p>
-                                     <p>Name Of Company/\n
-                                     Type of Business: <b>{$row['noc_tob']}</b></p>
-                                     <p>Position in Company: <b>{$row['position_in_company']}</b></p>
-                                     <p>Tracked By: <b>{$row['tracked_by']}</b></p>
-                                     <p>Permanent: <b>{$row['permanent']}</b></p>
-                                     <p>Related Field: <b>{$row['related_field']}</b></p>
-                                     <p>More than 6 months employed: <b>{$row['employed_for_over_six_months']}</b></p>
-                                     <p>Gender: <b>{$row['gender']}</b></p>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 ";
                         //delete studdent modal
                         echo "
                     <div class='modal fade' id='deleteAlumniModal{$row['id']}' tabindex='-1' role='dialog' aria-labelledby='deleteAlumniModalLabel{$row['id']}' aria-hidden='true'>
@@ -194,11 +165,9 @@ if (!isset($_SESSION["username"])) {
                                         <label for='editAlumniProgram'>Program Name:</label><br>
                                         <select name='editAlumniProgram' style='width: 90px; height: 40px'>";
 
-                        // Fetch data from the database for program_name
                         $queryProgram = "SELECT * FROM program_name";
                         $resultProgram = mysqli_query($connection, $queryProgram);
 
-                        // Loop through the results to generate options
                         while ($rowProgram = mysqli_fetch_assoc($resultProgram)) {
                             $selected = ($rowProgram['id'] == $row['program_name_id']) ? 'selected' : '';
                             echo '<option value="' . $rowProgram["id"] . '" ' . $selected . '>' . $rowProgram["program_name"] . '</option>';
@@ -305,6 +274,10 @@ if (!isset($_SESSION["username"])) {
                         <div class="form-group">
                             <label for="alumniEmail">Full Name:</label>
                             <input type="text" class="form-control" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="alumniEmail">School Year Graduated:</label>
+                            <input type="text" class="form-control" name="sygraduate" required>
                         </div>
                         <div class="form-group">
                             <label for="status">Status:</label><br>
@@ -605,20 +578,34 @@ if (!isset($_SESSION["username"])) {
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function() {
-        // Event handler for the program name filter
-        $('#filterProgram').change(function() {
-            var selectedProgram = $(this).val();
+        $('#filterProgram').change(filterTable);
+
+        $('#searchBtn').click(filterTable);
+
+        function filterTable() {
+            var selectedProgram = $('#filterProgram').val();
+            var selectedYear = $('#filtersy').val();
+            var searchText = $('#searchInput').val().toLowerCase();
 
             // Show all table rows
             $('#alumniTable tbody tr').show();
 
-            // Hide rows that don't match the selected program name
+            // Filter by program name
             if (selectedProgram) {
                 $('#alumniTable tbody tr').not('[data-program-name="' + selectedProgram + '"]').hide();
             }
-        });
+
+            // Filter by search input
+            if (searchText) {
+                $('#alumniTable tbody tr').filter(function() {
+                    return $(this).text().toLowerCase().indexOf(searchText) === -1;
+                }).hide();
+            }
+        }
     });
     </script>
+
+
 
     <script>
     function closeEditModal(id) {

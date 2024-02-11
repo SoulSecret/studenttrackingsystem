@@ -15,11 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add'])) {
         $related_field = mysqli_real_escape_string($connection, $_POST["Related_Field"]);
         $more_than_six_months_employed = mysqli_real_escape_string($connection, $_POST["More_than_six_months_employed"]);
         $gender = mysqli_real_escape_string($connection, $_POST["gender"]);
+        $sygraduate = mysqli_real_escape_string($connection, $_POST["sygraduate"]);
 
         $name = strtoupper($name);
         // SQL query to insert data into the student_form table
-        $insertQuery = "INSERT INTO students_form (program_name_id, fullname, status, noc_tob, position_in_company, tracked_by, permanent, related_field, employed_for_over_six_months, gender)
-            VALUES ('$prog_id', '$name', '$status', '$noc_tob', '$pic', '$tracked_by', '$permanent', '$related_field', '$more_than_six_months_employed', '$gender')";
+        $insertQuery = "INSERT INTO students_form (program_name_id, fullname, status, noc_tob, position_in_company, tracked_by, permanent, related_field, employed_for_over_six_months, gender, sygraduate)
+            VALUES ('$prog_id', '$name', '$status', '$noc_tob', '$pic', '$tracked_by', '$permanent', '$related_field', '$more_than_six_months_employed', '$gender', '$sygraduate')";
         $result = mysqli_query($connection, $insertQuery);
 
         if ($result) {
